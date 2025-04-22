@@ -13,6 +13,7 @@ import { problemInfo } from "./data/data"
 import { ModalContainer } from "./components/common/Modal"
 import { ModalContent } from "./components/ModalContent"
 import Logo from "@assets/logo.svg"
+import { RankingDialog } from "./components/RankingDialog"
 
 const Title: React.FC<React.PropsWithChildren> = (props) => 
     <TextBox weight={800} size={24}>
@@ -214,5 +215,11 @@ export const App = () => {
                 )}
             </div>
         </GridBox>
+        <div>
+
+        </div>
+        <RankingDialog 
+            problemNumber={probNum}
+        />
     </div>
 }
