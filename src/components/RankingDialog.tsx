@@ -1,9 +1,10 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Crown from "@assets/crown.svg"
 import { TextBox } from "./common/TextBox"
 import { DivProps } from "../global"
 import { HFlexBox } from "./common/FlexBox"
 import { css } from "@emotion/react"
+import axios from "axios"
 
 const PROB_NAME = ["1", "2", "3", "4", "5", "B1", "B2"]
 
@@ -12,20 +13,6 @@ interface RankingData {
     score: number,
     probNum: number
 }
-
-const dummy:RankingData[] = [
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0},
-    {name:"마리오", score: 20, probNum: 0}
-]
 
 interface NavElementProps {
     selected?: boolean
@@ -83,11 +70,22 @@ export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => 
     const [dialogHidden, setDialogHidden] = useState<boolean>(true)
     const [probNum, setProbNum] = useState<number>(props.problemNumber)
     
+    const [rankingData, setRankingData] = useState<RankingData[]>([])
+
+    const handleOpenDialog = () => {
+        axios.get("/api/ranking")
+        .then(res => res.data)
+        .then((data) => {
+            console.log(data)
+            setRankingData(data)
+            setDialogHidden(false)
+        })
+    }
 
     return (
         <>
             <div
-                onClick={() => setDialogHidden(false)}
+                onClick={handleOpenDialog}
                 css={{
                     display: "flex",
                     justifyContent: "center",
@@ -158,7 +156,7 @@ export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => 
                         overflowY: "auto"
                     }}>
                     {
-                        dummy
+                        rankingData
                         .filter((v, _i) => v.probNum === probNum)
                         .map((v, i) => 
                             <RankingElement
