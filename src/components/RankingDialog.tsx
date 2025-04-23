@@ -1,17 +1,24 @@
-import React, { useEffect, useState } from "react"
-import Crown from "@assets/crown.svg"
+import React, { useState } from "react"
+import Crown from "../assets/crown.svg"
 import { TextBox } from "./common/TextBox"
 import { DivProps } from "../global"
 import { HFlexBox } from "./common/FlexBox"
 import { css } from "@emotion/react"
 import axios from "axios"
 
-const PROB_NAME = ["1", "2", "3", "4", "5", "B1", "B2"]
+const PROB_NAME = [
+    ["1", "2", "3", "4", "5", "B1", "B2"],
+    ["1", "2", "3", "4", "5"]
+]
+
+const CATEGORY_NAME = ["SAF!", "숏코딩"]
 
 interface RankingData {
+    studentid: string,
     name: string,
     score: number,
-    probNum: number
+    prob: number,
+    category: number
 }
 
 interface NavElementProps {
@@ -54,26 +61,38 @@ const RankingElement: React.FC<React.PropsWithoutRef<RankingElementProps>> = (pr
     return (
         <div
             css={{
-                display: "flex"
+                display: "grid",
+                gridTemplateColumns: "50px 100px 100px auto",
+                justifyItems: "center",
+                alignItems: "center",
+                borderRadius: "5px",
+                height: "40px",
+                minHeight: "40px",
+                border: "1px solid gray",
+                padding: "0 20px"
             }}>
             <div>{props.rank}</div>
+            <div>{props.rankData.studentid}</div>
             <div>{props.rankData.name}</div>
+            <div>{props.rankData.score}</div>
         </div>
     )
 }
 
 interface RankingDialogProps {
-    problemNumber: number
+    problemNumber: number,
+    categoryNumber: number,
 }
 
 export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => {
     const [dialogHidden, setDialogHidden] = useState<boolean>(true)
     const [probNum, setProbNum] = useState<number>(props.problemNumber)
+    const [categoryNum, setCategoryNum] = useState<number>(props.categoryNumber)
     
     const [rankingData, setRankingData] = useState<RankingData[]>([])
 
     const handleOpenDialog = () => {
-        axios.get("/api/ranking")
+        axios.get("http://localhost:3000/api/ranking")
         .then(res => res.data)
         .then((data) => {
             console.log(data)
@@ -152,14 +171,18 @@ export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => 
                 </TextBox> */}
                 <div
                     css={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
                         flex: 1,
-                        overflowY: "auto"
+                        overflowY: "scroll",
                     }}>
                     {
                         rankingData
-                        .filter((v, _i) => v.probNum === probNum)
+                        .filter((v, _i) => v.prob === probNum && v.category == categoryNum)
                         .map((v, i) => 
                             <RankingElement
+                                key={i}
                                 rank={i + 1}
                                 rankData={v}
                             />
@@ -173,8 +196,29 @@ export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => 
                         justifyContent: "center"
                     }}
                     gap={24}
-                    center>
-                    {new Array(7)
+                    center
+                >
+                    <div css={{
+                            transition: "all linear 0.3s",
+                            borderRadius: "10px",
+                            padding: "12px 16px",
+                            backgroundColor: "white",
+                            width: "fit-content",
+                            cursor: "pointer",
+                            boxShadow: "0 0 3px lightgray",
+                            ":hover": {
+                                transform: "scale(1.02, 1.02)"
+                            }
+                        }}
+                        onClick={() => {
+                            setProbNum(0)
+                            setCategoryNum((prev) => (prev + 1) % CATEGORY_NAME.length)}
+                        }
+                    >
+                        {CATEGORY_NAME[categoryNum]}
+                    </div>
+
+                    {new Array(PROB_NAME[categoryNum].length)
                         .fill(null)
                         .map((_v, i) => 
                         <NavElement
@@ -182,7 +226,7 @@ export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => 
                             selected={probNum === i}
                             onClick={() => setProbNum(i)}
                         >
-                            {PROB_NAME[i]}
+                            {PROB_NAME[categoryNum][i]}
                         </NavElement>)}
                 </HFlexBox>
                 

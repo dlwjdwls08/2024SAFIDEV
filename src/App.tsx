@@ -12,8 +12,9 @@ import { NotiContainer } from "./components/common/Notification"
 import { problemInfo } from "./data/data"
 import { ModalContainer } from "./components/common/Modal"
 import { ModalContent } from "./components/ModalContent"
-import Logo from "@assets/logo.svg"
+import Logo from "./assets/logo.svg"
 import { RankingDialog } from "./components/RankingDialog"
+import axios from "axios"
 
 const Title: React.FC<React.PropsWithChildren> = (props) => 
     <TextBox weight={800} size={24}>
@@ -72,12 +73,29 @@ const NavElement: React.FC<React.PropsWithChildren<NavElementProps>> = (props) =
     </div>
 }
 
-const PROB_NAME = ["1", "2", "3", "4", "5", "B1", "B2"]
+const PROB_NAME = [
+    ["1", "2", "3", "4", "5", "B1", "B2"],
+    ["1", "2", "3", "4", "5"]
+]
+
+const CATEGORY_NAME = ["SAF!", "숏코딩"]
 
 export const App = () => {
-    const [code, setCode] = useState<string[]>(new Array(7).fill(""))
-    const [probState, setProbState] = useState<ProbState[]>(new Array(7).fill("none"))
+    const [code, setCode] = useState<string[][]>([new Array(7).fill(""), new Array(5).fill("")])
+    const [probState, setProbState] = useState<ProbState[][]>([new Array(7).fill("none"), new Array(5).fill("none")])
     const [probNum, setProbNum] = useState(0)
+    const [categoryNum, setCategoryNum] = useState(0)
+    const [studentID, setStudentID] = useState("")
+    const [name, setName] = useState("")
+    const [infoState, setInfoState] = useState(false)
+
+    const handleInfoStateSubmit = () => {
+        const sidregex = /^\d{2}-\d{3}$/
+        if (sidregex.test(studentID) && name !== "") {
+            setInfoState(true)
+            console.log(studentID, name)
+        }
+    }
 
     return <div css={css`overflow: hidden; height: 100vh;`}>
         <NotiContainer />
@@ -90,7 +108,13 @@ export const App = () => {
                 position: relative;
             `}
         >
-            <div css={css`position: absolute; left: 20px; top: 50%; transform: translateY(calc(-50% + 2px));`}>
+            <div 
+                css={{
+                    position: "absolute",
+                    left: "20px",
+                    top: "50%",
+                    transform: "translateY(calc(-50% + 2px))",
+                }}>
                 <img src={Logo} css={css`height: 100px;`} />
             </div>
             <div
@@ -120,28 +144,47 @@ export const App = () => {
                 gap={24}
                 center
             >
-                {new Array(7)
-                    .fill(null)
+                <div css={{
+                        transition: "all linear 0.3s",
+                        borderRadius: "10px",
+                        padding: "12px 16px",
+                        backgroundColor: "white",
+                        width: "fit-content",
+                        cursor: "pointer",
+                        boxShadow: "0 0 3px lightgray",
+                        ":hover": {
+                            transform: "scale(1.02, 1.02)"
+                        }
+                    }}
+                    onClick={() => {
+                        setProbNum(0)
+                        setCategoryNum((prev) => (prev + 1) % CATEGORY_NAME.length)}
+                    }
+                >
+                    {CATEGORY_NAME[categoryNum]}
+                </div>
+
+                {PROB_NAME[categoryNum]
                     .map((_v, i) => 
-                        <NavElement
-                            state={probState[i]}
-                            key={i}
-                            selected={probNum === i}
-                            onClick={() => setProbNum(i)}
-                        >
-                            {PROB_NAME[i]}
-                        </NavElement>
-                    )}
+                    <NavElement
+                        state={probState[categoryNum][i]}
+                        key={i}
+                        selected={probNum === i}
+                        onClick={() => setProbNum(i)}
+                    >
+                        {PROB_NAME[categoryNum][i]}
+                    </NavElement>
+                )}
             </HFlexBox>
         </div>
         <GridBox column={2} css={css`width: 100%; height: calc(100vh - 60px);`}>
             <div css={css`position: relative;`}>
                 <Editor
                     theme="vs-dark"
-                    value={code[probNum]}
+                    value={code[categoryNum][probNum]}
                     onChange={(v) => {
                         const newCode = [...code]
-                        newCode[probNum] = v ?? ""
+                        newCode[categoryNum][probNum] = v ?? ""
                         setCode(newCode)
                     }}
                     options={{
@@ -154,58 +197,134 @@ export const App = () => {
                         }
                     `}
                 />
-                <div
-                    css={css`
-                        padding: 12px 16px;
-                        background-color: #DDDFE0;
-                        border-radius: 8px;
-                        width: fit-content;
-                        transition: all 0.3s linear;
-                        cursor: pointer;
-                        position: absolute;
-                        right: 32px;
-                        bottom: 20px;
+                {infoState ? (
+                    <div
+                        css={css`
+                            padding: 12px 16px;
+                            background-color: #DDDFE0;
+                            border-radius: 8px;
+                            width: fit-content;
+                            transition: all 0.3s linear;
+                            cursor: pointer;
+                            position: absolute;
+                            right: 32px;
+                            bottom: 20px;
 
-                        :hover {
-                            transform: translateY(-3px);
-                            background-color: #F5F6F7;
-                        }
-                    `}
-                    onClick={() => {
-                        const res = checkValid(probNum, code[probNum])
-                        if (res) {
-                            EventHandler.trigger("notification", "allowed", "맞았습니다!")
-                            setProbState((probState) => {
-                                const newProbState = [...probState]
-                                newProbState[probNum] = "correct"
-                                return newProbState
-                            })
-                        }
-                        else {
-                            EventHandler.trigger("notification", "forbidden", "틀렸습니다.")
-                            setProbState((probState) => {
-                                const newProbState = [...probState]
-                                newProbState[probNum] = "wrong"
-                                return newProbState
-                            })
-                        }
-                    }}
-                >
-                    <TextBox size={18} weight={600}>제출</TextBox>
-                </div>
+                            :hover {
+                                transform: translateY(-3px);
+                                background-color: #F5F6F7;
+                            }
+                        `}
+                        onClick={async () => {
+                            const res = await checkValid(categoryNum, probNum, code[categoryNum][probNum])
+                            if (res) {
+                                EventHandler.trigger("notification", "allowed", "맞았습니다!")
+                                await axios.post("https://2025-safidevserver.vercel.app/api/ranking", {
+                                    studentID: studentID,
+                                    name: name,
+                                    score: code[categoryNum][probNum].length,
+                                    prob: probNum,
+                                    category: categoryNum
+                                })
+                                setProbState((probState) => {
+                                    const newProbState = probState.map((row, rowIdx) => 
+                                        rowIdx === categoryNum
+                                            ? row.map((cell, colIdx) =>
+                                                colIdx === probNum ? "correct" : cell
+                                            )
+                                            : [...row]
+                                    )
+                                    return newProbState
+                                })
+                            }
+                            else {
+                                EventHandler.trigger("notification", "forbidden", "틀렸습니다.")
+                                setProbState((probState) => {
+                                    const newProbState = probState.map((row, rowIdx) => 
+                                        rowIdx === categoryNum
+                                            ? row.map((cell, colIdx) =>
+                                                colIdx === probNum ? "wrong" : cell
+                                            )
+                                            : [...row]
+                                    )
+                                    return newProbState
+                                })
+                            }
+                        }}
+                    >
+                        <TextBox size={18} weight={600}>제출</TextBox>
+                    </div>
+                ) : (
+                    <div
+                        css={css`
+                            padding: 12px 16px;
+                            background-color: #DDDFE0;
+                            border-radius: 8px;
+                            width: 150px;
+                            transition: all 0.3s linear;
+                            position: absolute;
+                            right: 32px;
+                            bottom: 20px;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 5px;
+                        `}
+                    >
+                        <input
+                            css={{
+                                outline: "none",
+                                background: "rgb(200, 200, 200)",
+                                borderRadius: "5px",
+                                border: "none",
+                                textAlign: "center"
+                                
+                            }}
+                            placeholder="ex.25-000"
+                            value={studentID}
+                            onChange={(e) => {
+                                setStudentID(e.target.value)
+                            }}
+                        />
+                        <input
+                            css={{
+                                outline: "none",
+                                background: "rgb(200, 200, 200)",
+                                borderRadius: "5px",
+                                border: "none",
+                                textAlign: "center"
+                            }}
+                            placeholder="ex.차재윤"
+                            value={name}
+                            onChange={(e) => {
+                                setName(e.target.value)
+                            }}
+                        />
+                        <button
+                            css={{
+                                background: "rgb(200, 200, 200)",
+                                borderRadius: "5px",
+                                border: "none",
+                                cursor: "pointer"
+                            }}
+                            onClick={handleInfoStateSubmit}    
+                        >
+                            확인
+                        </button>
+                    </div>
+                )}
             </div>
             <div css={css`padding: 24px; overflow-y: auto; white-space: pre-wrap;`}>
-                <Title>문제 {PROB_NAME[probNum]}</Title>
+                <Title>문제 {PROB_NAME[categoryNum][probNum]}</Title>
                 <VBox height={8} />
                 <div css={css`line-height: 24px;`}>
-                    {problemInfo[probNum].problem}
+                    {problemInfo[categoryNum][probNum].problem}
                 </div>
                 <VBox height={32} />
-                {problemInfo[probNum].example.map(({ input, output }, i) => 
+                {problemInfo[categoryNum][probNum].example.map(({ input, output }, i) => 
                     <Fragment key={i}>
                         <Subtitle>예제 입력 {i + 1}</Subtitle>
                         <VBox height={8} />
-                        <Section>{input.length === 0 ? "없음" : input.join(", ")}</Section>
+                        <Section>{categoryNum === 0 ? input.length === 0 ? "없음" : (input as number[]).join(", ") : input as string}</Section>
                         <VBox height={32} />
                         <Subtitle>예제 출력 {i + 1}</Subtitle>
                         <VBox height={8} />
@@ -220,6 +339,7 @@ export const App = () => {
         </div>
         <RankingDialog 
             problemNumber={probNum}
+            categoryNumber={categoryNum}
         />
     </div>
 }

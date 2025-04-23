@@ -3,9 +3,10 @@ import { CSSTransition } from "react-transition-group"
 import { useEffect, useRef, useState } from "react"
 import { EventHandler } from "../../utils/event"
 
-import Check from "@assets/check.svg"
-import Forbidden from "@assets/forbidden.svg"
+import Check from "../../assets/check.svg"
+import Forbidden from "../../assets/forbidden.svg"
 import { omit } from "../../utils/omit"
+
 
 type NotiType = "allowed" | "forbidden"
 interface INotificationInfo {
