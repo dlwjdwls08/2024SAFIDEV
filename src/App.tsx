@@ -55,7 +55,7 @@ const NavElement: React.FC<React.PropsWithChildren<NavElementProps>> = (props) =
             box-sizing: border-box;
             background-color: ${props.selected ? "var(--nav-hover)" : "inherit"};
             font-variant-numeric: tabular-nums;
-            border-bottom: ${props.selected ? "3px solid #53B0AE" : "none"};
+            border-bottom: ${props.selected ? "3px solid #fc859f" : "none"};
 
             :hover {
                 background-color: var(--nav-hover);
@@ -280,11 +280,12 @@ export const App = () => {
                                 textAlign: "center"
                                 
                             }}
-                            placeholder="ex.25-000"
+                            placeholder="ex.23-114"
                             value={studentID}
                             onChange={(e) => {
                                 setStudentID(e.target.value)
                             }}
+                            onSubmit={handleInfoStateSubmit}
                         />
                         <input
                             css={{
@@ -299,6 +300,7 @@ export const App = () => {
                             onChange={(e) => {
                                 setName(e.target.value)
                             }}
+                            onSubmit={handleInfoStateSubmit}
                         />
                         <button
                             css={{

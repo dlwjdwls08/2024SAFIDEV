@@ -35,7 +35,7 @@ const NavElement: React.FC<React.PropsWithChildren<NavElementProps>> = (props) =
             box-sizing: border-box;
             background-color: ${props.selected ? "var(--nav-hover)" : "inherit"};
             font-variant-numeric: tabular-nums;
-            border-bottom: ${props.selected ? "3px solid #53B0AE" : "none"};
+            border-bottom: ${props.selected ? "3px solid #fc859f" : "none"};
 
             :hover {
                 background-color: var(--nav-hover);
