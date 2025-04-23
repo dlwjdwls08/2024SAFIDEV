@@ -176,6 +176,9 @@ export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => 
                         gap: "10px",
                         flex: 1,
                         overflowY: "scroll",
+                        "::-webkit-scrollbar": {
+                            display: "none"
+                        }
                     }}>
                     {
                         rankingData

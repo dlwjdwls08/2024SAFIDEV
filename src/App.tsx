@@ -181,6 +181,7 @@ export const App = () => {
             <div css={css`position: relative;`}>
                 <Editor
                     theme="vs-dark"
+                    language={categoryNum === 1 ? "python" : ""}
                     value={code[categoryNum][probNum]}
                     onChange={(v) => {
                         const newCode = [...code]
