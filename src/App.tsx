@@ -93,7 +93,9 @@ export const App = () => {
         const sidregex = /^\d{2}-\d{3}$/
         if (sidregex.test(studentID) && name !== "") {
             setInfoState(true)
+            EventHandler.trigger("notification", "allowed", `${studentID} ${name}`)            
             console.log(studentID, name)
+
         }
     }
 
