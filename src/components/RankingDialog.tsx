@@ -92,7 +92,9 @@ export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => 
     const [rankingData, setRankingData] = useState<RankingData[]>([])
 
     const handleOpenDialog = () => {
-        axios.get("http://localhost:3000/api/ranking")
+        axios.get("https://2025-safidevserver.vercel.app/api/ranking", {
+            withCredentials: true
+        })
         .then(res => res.data)
         .then((data) => {
             console.log(data)

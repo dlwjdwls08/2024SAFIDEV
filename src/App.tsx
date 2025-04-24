@@ -226,6 +226,11 @@ export const App = () => {
                                     score: code[categoryNum][probNum].length,
                                     prob: probNum,
                                     category: categoryNum
+                                }, {
+                                    withCredentials: true,
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
                                 })
                                 setProbState((probState) => {
                                     const newProbState = probState.map((row, rowIdx) => 
