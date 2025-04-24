@@ -1,8 +1,9 @@
-type TokenType = "push" | "jmpb" | "jmpbtmp" | "jmpf" | "add" | "neg" | "dup" | "ascprnt" | "intprnt" | "intinpt" | "swap" | "rtt"
+type TokenType = "push" | "jmpb" | "jmpbtmp" | "jmpf" | "add" | "neg" | "dup" | "ascprnt" | "intprnt" | "intinpt" | "swap" | "rt"
 
 interface Token {
     type: TokenType
     data?: number[]
+    where?: number
 }
 
 interface ParenToken extends Token {
@@ -17,8 +18,9 @@ export const parse = (code: string) => {
 
     while (pos < code.length) {
         const current = code[pos]
+        const where = current.toUpperCase() === current ? 0 : 1
         
-        if (current === "S") {
+        if (current.toUpperCase() === "S") {
             if (pos < code.length) pos++
             let num = 0
             while (pos < code.length) {
@@ -29,17 +31,19 @@ export const parse = (code: string) => {
             if (pos >= 0) pos--
             parseResult.push({
                 type: "push",
-                data: [num]
+                data: [num],
+                where: where
             })
         }
-        else if (current === "A") parseResult.push({ type: "add" })
-        else if (current === "F") parseResult.push({ type: "neg" })
-        else if (current === "K") parseResult.push({ type: "dup" })
+        else if (current.toUpperCase() === "A") parseResult.push({ type: "add", where: where })
+        else if (current.toUpperCase() === "F") parseResult.push({ type: "neg", where: where })
+        else if (current.toUpperCase() === "K") parseResult.push({ type: "dup", where: where })
         else if (current === "!") parseResult.push({ type: "ascprnt" })
         else if (current === "~") parseResult.push({ type: "intprnt" })
         else if (current === "?") parseResult.push({ type: "intinpt" })
         else if (current === "*") parseResult.push({ type: "swap" })
-        else if (current === "@") parseResult.push({ type: "rtt" })
+        else if (current === "@") parseResult.push({ type: "rt", where: 0})
+        else if (current === "#") parseResult.push({ type: "rt", where: 1})
         else if (current === "[") {
             parseResult.push({ type: "jmpb" })
             parenStack.push({ type: "jmpbtmp", data: [parseResult.length - 1, pos] })
@@ -68,14 +72,14 @@ export const parse = (code: string) => {
 
 export const execute = (code: string, input: number[]) => {
     const tokens = parse(code)
-    const stack: number[] = []
+    const stack: number[][] = [[], []]
     input.reverse()
     let ans = ""
     let pos = 0
     
-    const pop = () => {
-        if (stack.length === 0) return 0
-        return stack.pop() as number
+    const pop = (where: number) => {
+        if (stack[where].length === 0) return 0
+        return stack[where].pop() as number
     }
 
     const inputPop = () => {
@@ -87,34 +91,32 @@ export const execute = (code: string, input: number[]) => {
         const current = tokens[pos]
         console.log(current.type, stack, pos)
 
-        if (current.type === "push") stack.push(current.data?.[0] ?? 0)
-        else if (current.type === "add") stack.push(pop() + pop())
-        else if (current.type === "neg") stack.push(-pop())
-        else if (current.type === "dup") stack.push(stack.at(-1) ?? 0)
+        if (current.type === "push") stack[current.where!].push(current.data?.[0] ?? 0)
+        else if (current.type === "add") stack[current.where!].push(pop(current.where!) + pop(current.where!))
+        else if (current.type === "neg") stack[current.where!].push(-pop(current.where!))
+        else if (current.type === "dup") stack[(current.where! + 1) % 2].push(stack[current.where!].at(-1) ?? 0)
         else if (current.type === "ascprnt") {
-            const temp = pop()
+            const temp = pop(0)
             if (temp < 0) throw new Error("ASCII range error")
             ans += String.fromCharCode(temp)
         }
-        else if (current.type === "intprnt") ans += pop().toString()
-        else if (current.type === "intinpt") stack.push(inputPop())
+        else if (current.type === "intprnt") ans += pop(0).toString()
+        else if (current.type === "intinpt") stack[1].push(inputPop())
         else if (current.type === "swap") {
-            const temp = pop()
-            stack.push(temp, pop())
+            const temp = pop(0)
+            stack[0].push(temp, pop(0))
         }
-        else if (current.type === "rtt") {
-            if (stack.length < 3) return
-            const temp = [stack.at(-3), stack.at(-2), stack.at(-1)] as number[]
-            stack[stack.length - 3] = temp[1]
-            stack[stack.length - 2] = temp[2]
-            stack[stack.length - 1] = temp[0]
+        else if (current.type === "rt") {
+            if (stack[current.where!].length === 0) return
+            const first = stack[current.where!].shift()
+            stack[current.where!].push(first!)
         }
         else if (current.type === "jmpb") {
-            const p = pop()
+            const p = pop(0)
             if (p <= 0) pos = (current.data?.[0] ?? 0)
         }
         else if (current.type === "jmpf") {
-            const p = pop()
+            const p = pop(0)
             if (p > 0) pos = (current.data?.[0] ?? 0)
         }
         

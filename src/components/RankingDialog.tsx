@@ -97,7 +97,6 @@ export const RankingDialog: React.FC<DivProps<RankingDialogProps>> = (props) => 
         })
         .then(res => res.data)
         .then((data) => {
-            console.log(data)
             setRankingData(data)
             setDialogHidden(false)
         })
