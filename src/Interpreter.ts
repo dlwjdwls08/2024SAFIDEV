@@ -119,10 +119,12 @@ export const execute = (code: string, input: number[]) => {
         else if (current.type === "jmpb") {
             const p = pop(0)
             if (p <= 0) pos = (current.data?.[0] ?? 0)
+            stack[0].push(p)
         }
         else if (current.type === "jmpf") {
             const p = pop(0)
             if (p > 0) pos = (current.data?.[0] ?? 0)
+            stack[0].push(p)
         }
         
         if (pos < tokens.length) pos++
