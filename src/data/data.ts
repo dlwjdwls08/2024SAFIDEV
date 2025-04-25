@@ -223,7 +223,10 @@ export const problemInfo: IProblem[][] = [
                 
             ],
             test: [
-
+                {
+                    input: "",
+                    output: "맞추지마세요"
+                }
             ]
         },
         {
@@ -232,7 +235,10 @@ export const problemInfo: IProblem[][] = [
 
             ],
             test: [
-                
+                {
+                    input: "",
+                    output: "맞추지마세요"
+                }
             ]
         },
         {
@@ -241,7 +247,10 @@ export const problemInfo: IProblem[][] = [
 
             ],
             test: [
-
+                {
+                    input: "",
+                    output: "맞추지마세요"
+                }
             ]
         }
     ]

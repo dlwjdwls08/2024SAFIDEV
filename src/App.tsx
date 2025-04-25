@@ -78,7 +78,7 @@ const PROB_NAME = [
     ["1", "2", "3", "B1", "B2", "B3"]
 ]
 
-const CATEGORY_NAME = ["SAF!", "숏코딩"]
+const CATEGORY_NAME = ["SAF!!", "숏코딩"]
 
 export const App = () => {
     const [code, setCode] = useState<string[][]>([new Array(6).fill(""), new Array(6).fill("")])

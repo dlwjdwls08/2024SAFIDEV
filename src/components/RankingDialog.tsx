@@ -11,7 +11,7 @@ const PROB_NAME = [
     ["1", "2", "3", "B1", "B2", "B3"]
 ]
 
-const CATEGORY_NAME = ["SAF!", "숏코딩"]
+const CATEGORY_NAME = ["SAF!!", "숏코딩"]
 
 interface RankingData {
     studentid: string,
