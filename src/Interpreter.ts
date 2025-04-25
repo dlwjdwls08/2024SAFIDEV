@@ -91,7 +91,7 @@ export const execute = (code: string, input: number[]) => {
 
     while (pos < tokens.length) {
         const current = tokens[pos]
-        console.log(current.type, stack, pos)
+        console.log(current.type, stack[0], stack[1], pos)
 
         if (current.type === "push") stack[current.where!].push(current.data?.[0] ?? 0)
         else if (current.type === "add") stack[current.where!].push(pop(current.where!) + pop(current.where!))
