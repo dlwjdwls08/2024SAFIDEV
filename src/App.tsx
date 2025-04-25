@@ -74,15 +74,15 @@ const NavElement: React.FC<React.PropsWithChildren<NavElementProps>> = (props) =
 }
 
 const PROB_NAME = [
-    ["1", "2", "3", "4", "5", "B1", "B2"],
-    ["1", "2", "3", "4", "5"]
+    ["1", "2", "3", "4", "B1", "B2"],
+    ["1", "2", "3", "B1", "B2", "B3"]
 ]
 
 const CATEGORY_NAME = ["SAF!", "숏코딩"]
 
 export const App = () => {
-    const [code, setCode] = useState<string[][]>([new Array(7).fill(""), new Array(5).fill("")])
-    const [probState, setProbState] = useState<ProbState[][]>([new Array(7).fill("none"), new Array(5).fill("none")])
+    const [code, setCode] = useState<string[][]>([new Array(6).fill(""), new Array(6).fill("")])
+    const [probState, setProbState] = useState<ProbState[][]>([new Array(6).fill("none"), new Array(6).fill("none")])
     const [probNum, setProbNum] = useState(0)
     const [categoryNum, setCategoryNum] = useState(0)
     const [studentID, setStudentID] = useState("")

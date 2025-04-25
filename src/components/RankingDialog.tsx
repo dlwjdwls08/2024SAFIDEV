@@ -7,8 +7,8 @@ import { css } from "@emotion/react"
 import axios from "axios"
 
 const PROB_NAME = [
-    ["1", "2", "3", "4", "5", "B1", "B2"],
-    ["1", "2", "3", "4", "5"]
+    ["1", "2", "3", "4", "B1", "B2"],
+    ["1", "2", "3", "B1", "B2", "B3"]
 ]
 
 const CATEGORY_NAME = ["SAF!", "숏코딩"]
