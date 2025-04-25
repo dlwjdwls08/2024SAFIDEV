@@ -13,6 +13,7 @@ export const checkValid = async (category: number, prob: number, code: string) =
                 const res = await axios.post("https://emkc.org/api/v2/piston/execute", {
                     language: "python3",
                     version: "3.10.0",
+                    run_timeout: 1000,
                     files: [
                         {
                             content: code
