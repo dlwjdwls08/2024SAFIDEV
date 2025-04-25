@@ -123,10 +123,6 @@ export const problemInfo: IProblem[][] = [
         {
             problem: "SAF의 슬로건을 아스키 코드를 이용하여 출력하시오.",
             example: [
-                {
-                    input: [],
-                    output: "Swim Along the Future"
-                }
             ],
             test: [
                 {
